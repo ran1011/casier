@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Kasir - Sistem Kasir Otomatis</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <h2>Memuat Dashboard Kasir</h2>
+            <p>Menyiapkan sistem untuk Anda...</p>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <i class="fas fa-cash-register"></i>
+            <h2>Kasir<span>Pro</span></h2>
+        </div>
+        
+        <div class="user-info">
+            <div class="user-avatar">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="user-details">
+                <h3 id="kasir-name">Kasir</h3>
+                <p id="current-date"></p>
+            </div>
+        </div>
+        
+        <nav class="menu">
+            <a href="#" class="menu-item active" data-target="dashboard">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="#" class="menu-item" data-target="order">
+                <i class="fas fa-utensils"></i>
+                <span>Pesan Makanan</span>
+            </a>
+            <a href="#" class="menu-item" data-target="menu-management">
+                <i class="fas fa-list"></i>
+                <span>Kelola Menu</span>
+            </a>
+            <a href="#" class="menu-item" data-target="history">
+                <i class="fas fa-history"></i>
+                <span>Riwayat Order</span>
+            </a>
+            <a href="#" class="menu-item" data-target="inventory">
+                <i class="fas fa-boxes"></i>
+                <span>Stok & Pengeluaran</span>
+            </a>
+            <a href="#" class="menu-item" data-target="queue">
+                <i class="fas fa-tasks"></i>
+                <span>Antrian Order</span>
+            </a>
+            <a href="#" class="menu-item" data-target="settings">
+                <i class="fas fa-cog"></i>
+                <span>Pengaturan</span>
+            </a>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <div class="today-menu">
+                <h4><i class="fas fa-flag"></i> Menu Hari Ini</h4>
+                <p id="today-menu-note">-</p>
+            </div>
+            <button id="logout-btn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Keluar</span>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <h1 id="page-title">Dashboard</h1>
+                <div class="breadcrumb">
+                    <span>Dashboard</span>
+                </div>
+            </div>
+            
+            <div class="header-right">
+                <div class="currency-display">
+                    <span id="currency-symbol">฿</span>
+                    <span id="current-balance">0</span>
+                </div>
+                <div class="time-display">
+                    <i class="far fa-clock"></i>
+                    <span id="current-time">--:--:--</span>
+                </div>
+                <button class="notif-btn">
+                    <i class="far fa-bell"></i>
+                    <span class="notif-count">0</span>
+                </button>
+            </div>
+        </header>
+        
+        <!-- Dashboard Content -->
+        <div class="content-area">
+            <!-- Dashboard Section (Default) -->
+            <section id="dashboard" class="content-section active">
+                <div class="section-header">
+                    <h2><i class="fas fa-tachometer-alt"></i> Dashboard Utama</h2>
+                    <p>Ringkasan pendapatan dan statistik penjualan</p>
+                </div>
+                
+                <!-- Statistik Pendapatan -->
+                <div class="stats-cards">
+                    <div class="stat-card">
+                        <div class="stat-icon daily">
+                            <i class="fas fa-calendar-day"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Pendapatan Harian</h3>
+                            <p class="stat-value"><span id="daily-income">0</span> <span class="currency">฿</span></p>
+                            <p class="stat-change">+12% dari kemarin</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon weekly">
+                            <i class="fas fa-calendar-week"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Pendapatan Mingguan</h3>
+                            <p class="stat-value"><span id="weekly-income">0</span> <span class="currency">฿</span></p>
+                            <p class="stat-change">+8% dari minggu lalu</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon monthly">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Pendapatan Bulanan</h3>
+                            <p class="stat-value"><span id="monthly-income">0</span> <span class="currency">฿</span></p>
+                            <p class="stat-change">+15% dari bulan lalu</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon orders">
+                            <i class="fas fa-shopping-bag"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>Total Pesanan</h3>
+                            <p class="stat-value"><span id="total-orders">0</span></p>
+                            <p class="stat-change">Hari ini: <span id="today-orders">0</span> order</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Grafik dan Menu Favorit -->
+                <div class="dashboard-grid">
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <h3><i class="fas fa-chart-line"></i> Grafik Pendapatan 7 Hari Terakhir</h3>
+                            <div class="chart-controls">
+                                <button class="chart-btn active" data-period="week">Mingguan</button>
+                                <button class="chart-btn" data-period="month">Bulanan</button>
+                            </div>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="revenueChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="favorites-container">
+                        <div class="favorites-header">
+                            <h3><i class="fas fa-fire"></i> Menu Favorit</h3>
+                            <button class="refresh-btn" id="refresh-favorites">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                        </div>
+                        <div class="favorites-list" id="favorites-list">
+                            <!-- Daftar menu favorit akan diisi oleh JavaScript -->
+                            <div class="no-data">
+                                <i class="fas fa-utensils"></i>
+                                <p>Belum ada data penjualan</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Ringkasan Hari Ini -->
+                <div class="today-summary">
+                    <div class="summary-header">
+                        <h3><i class="fas fa-clipboard-list"></i> Ringkasan Hari Ini</h3>
+                        <button class="print-btn" id="print-summary">
+                            <i class="fas fa-print"></i> Cetak
+                        </button>
+                    </div>
+                    <div class="summary-content">
+                        <div class="summary-item">
+                            <span class="summary-label">Order Selesai:</span>
+                            <span class="summary-value" id="completed-orders">0</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Order Dalam Proses:</span>
+                            <span class="summary-value" id="pending-orders">0</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Rata-rata Nilai Order:</span>
+                            <span class="summary-value" id="average-order">0 ฿</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Menu Terjual Hari Ini:</span>
+                            <span class="summary-value" id="menu-sold-today">0</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Order Section -->
+            <section id="order" class="content-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-utensils"></i> Pesan Makanan</h2>
+                    <p>Input order makanan untuk tempat makan atau delivery</p>
+                </div>
+                
+                <div class="order-container">
+                    <div class="order-left">
+                        <!-- Kategori Menu -->
+                        <div class="menu-categories">
+                            <button class="category-btn active" data-category="all">Semua</button>
+                            <button class="category-btn" data-category="makanan">Makanan</button>
+                            <button class="category-btn" data-category="minuman">Minuman</button>
+                            <button class="category-btn" data-category="snack">Snack</button>
+                        </div>
+                        
+                        <!-- Daftar Menu -->
+                        <div class="menu-list" id="menu-list">
+                            <!-- Menu akan diisi oleh JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <div class="order-right">
+                        <!-- Form Pesanan -->
+                        <div class="order-form">
+                            <div class="form-header">
+                                <h3><i class="fas fa-receipt"></i> Detail Pesanan</h3>
+                                <button class="clear-btn" id="clear-order">
+                                    <i class="fas fa-trash"></i> Hapus
+                                </button>
+                            </div>
+                            
+                            <div class="order-type-selector">
+                                <label>Jenis Order:</label>
+                                <div class="order-type-options">
+                                    <label class="order-type-option">
+                                        <input type="radio" name="order-type" value="dine-in" checked>
+                                        <span><i class="fas fa-store"></i> Tempat Makan</span>
+                                    </label>
+                                    <label class="order-type-option">
+                                        <input type="radio" name="order-type" value="delivery">
+                                        <span><i class="fas fa-motorcycle"></i> Delivery</span>
+                                    </label>
+                                    <label class="order-type-option">
+                                        <input type="radio" name="order-type" value="takeaway">
+                                        <span><i class="fas fa-shopping-bag"></i> Takeaway</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <!-- Detail Delivery (hanya tampil jika delivery dipilih) -->
+                            <div class="delivery-details" id="delivery-details" style="display: none;">
+                                <div class="form-group">
+                                    <label for="delivery-address"><i class="fas fa-map-marker-alt"></i> Alamat Delivery:</label>
+                                    <textarea id="delivery-address" rows="2" placeholder="Masukkan alamat lengkap"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="delivery-phone"><i class="fas fa-phone"></i> Nomor Telepon:</label>
+                                    <input type="text" id="delivery-phone" placeholder="Masukkan nomor telepon">
+                                </div>
+                            </div>
+                            
+                            <!-- Daftar Pesanan -->
+                            <div class="order-items-container">
+                                <h4><i class="fas fa-list-ol"></i> Daftar Pesanan</h4>
+                                <div class="order-items" id="order-items">
+                                    <div class="no-order">
+                                        <i class="fas fa-shopping-cart"></i>
+                                        <p>Belum ada item dalam pesanan</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Ringkasan Pesanan -->
+                            <div class="order-summary">
+                                <div class="summary-row">
+                                    <span>Subtotal:</span>
+                                    <span id="order-subtotal">0 ฿</span>
+                                </div>
+                                <div class="summary-row">
+                                    <span>Biaya Delivery:</span>
+                                    <span id="delivery-fee">0 ฿</span>
+                                </div>
+                                <div class="summary-row total">
+                                    <span>Total:</span>
+                                    <span id="order-total">0 ฿</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Keterangan Tambahan -->
+                            <div class="form-group">
+                                <label for="order-notes"><i class="fas fa-sticky-note"></i> Keterangan Pesanan:</label>
+                                <textarea id="order-notes" rows="2" placeholder="Tambahkan catatan untuk pesanan ini"></textarea>
+                            </div>
+                            
+                            <!-- Tombol Aksi -->
+                            <div class="order-actions">
+                                <button class="btn secondary" id="save-order">
+                                    <i class="fas fa-save"></i> Simpan Draft
+                                </button>
+                                <button class="btn primary" id="process-order">
+                                    <i class="fas fa-check-circle"></i> Proses Pesanan
+                                </button>
+                                <button class="btn success" id="print-receipt">
+                                    <i class="fas fa-print"></i> Cetak Struk
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Menu Management Section -->
+            <section id="menu-management" class="content-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-list"></i> Kelola Menu</h2>
+                    <p>Tambah, edit, atau hapus menu makanan dan minuman</p>
+                </div>
+                
+                <div class="menu-management-container">
+                    <div class="menu-form-section">
+                        <h3><i class="fas fa-plus-circle"></i> Tambah/Edit Menu</h3>
+                        <form id="menu-form">
+                            <input type="hidden" id="menu-id">
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="menu-name">Nama Menu:</label>
+                                    <input type="text" id="menu-name" required placeholder="Nama menu">
+                                </div>
+                                <div class="form-group">
+                                    <label for="menu-category">Kategori:</label>
+                                    <select id="menu-category" required>
+                                        <option value="">Pilih Kategori</option>
+                                        <option value="makanan">Makanan</option>
+                                        <option value="minuman">Minuman</option>
+                                        <option value="snack">Snack</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="menu-price">Harga (฿):</label>
+                                    <input type="number" id="menu-price" required min="0" placeholder="Harga dalam Baht">
+                                </div>
+                                <div class="form-group">
+                                    <label for="menu-cost">Biaya Produksi (฿):</label>
+                                    <input type="number" id="menu-cost" required min="0" placeholder="Biaya bahan">
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="menu-stock">Stok:</label>
+                                    <input type="number" id="menu-stock" required min="0" placeholder="Jumlah stok">
+                                </div>
+                                <div class="form-group">
+                                    <label for="menu-image">Gambar (URL):</label>
+                                    <input type="text" id="menu-image" placeholder="URL gambar (opsional)">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="menu-description">Deskripsi:</label>
+                                <textarea id="menu-description" rows="2" placeholder="Deskripsi menu"></textarea>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="button" class="btn secondary" id="clear-form">
+                                    <i class="fas fa-times"></i> Batal
+                                </button>
+                                <button type="submit" class="btn primary">
+                                    <i class="fas fa-save"></i> Simpan Menu
+                                </button>
+                                <button type="button" class="btn danger" id="delete-menu" style="display: none;">
+                                    <i class="fas fa-trash"></i> Hapus Menu
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <div class="menu-list-section">
+                        <div class="section-header">
+                            <h3><i class="fas fa-list-ul"></i> Daftar Menu</h3>
+                            <div class="search-box">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="menu-search" placeholder="Cari menu...">
+                            </div>
+                        </div>
+                        
+                        <div class="menu-table-container">
+                            <table class="menu-table">
+                                <thead>
+                                    <tr>
+                                        <th>Nama Menu</th>
+                                        <th>Kategori</th>
+                                        <th>Harga</th>
+                                        <th>Stok</th>
+                                        <th>Biaya</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="menu-table-body">
+                                    <!-- Data menu akan diisi oleh JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- History Section -->
+            <section id="history" class="content-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-history"></i> Riwayat Order</h2>
+                    <p>Lihat dan filter riwayat pesanan yang telah diproses</p>
+                </div>
+                
+                <div class="history-controls">
+                    <div class="filter-controls">
+                        <div class="filter-group">
+                            <label>Filter Tanggal:</label>
+                            <select id="history-filter-date">
+                                <option value="today">Hari Ini</option>
+                                <option value="week">Minggu Ini</option>
+                                <option value="month">Bulan Ini</option>
+                                <option value="all">Semua</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Filter Status:</label>
+                            <select id="history-filter-status">
+                                <option value="all">Semua Status</option>
+                                <option value="completed">Selesai</option>
+                                <option value="pending">Dalam Proses</option>
+                                <option value="cancelled">Dibatalkan</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Filter Tipe:</label>
+                            <select id="history-filter-type">
+                                <option value="all">Semua Tipe</option>
+                                <option value="dine-in">Tempat Makan</option>
+                                <option value="delivery">Delivery</option>
+                                <option value="takeaway">Takeaway</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <button class="btn secondary" id="export-history">
+                        <i class="fas fa-download"></i> Ekspor Data
+                    </button>
+                </div>
+                
+                <div class="history-list" id="history-list">
+                    <!-- Riwayat order akan diisi oleh JavaScript -->
+                </div>
+            </section>
+            
+            <!-- Inventory Section -->
+            <section id="inventory" class="content-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-boxes"></i> Stok & Pengeluaran</h2>
+                    <p>Kelola stok barang dan catatan pengeluaran</p>
+                </div>
+                
+                <div class="inventory-container">
+                    <div class="inventory-section">
+                        <h3><i class="fas fa-box-open"></i> Manajemen Stok</h3>
+                        <div class="stock-controls">
+                            <button class="btn primary" id="add-stock">
+                                <i class="fas fa-plus"></i> Tambah Stok
+                            </button>
+                            <button class="btn secondary" id="low-stock-alert">
+                                <i class="fas fa-exclamation-triangle"></i> Stok Rendah
+                            </button>
+                        </div>
+                        
+                        <div class="stock-table-container">
+                            <table class="stock-table">
+                                <thead>
+                                    <tr>
+                                        <th>Nama Barang</th>
+                                        <th>Stok Saat Ini</th>
+                                        <th>Stok Minimum</th>
+                                        <th>Status</th>
+                                        <th>Terakhir Diperbarui</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="stock-table-body">
+                                    <!-- Data stok akan diisi oleh JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="expense-section">
+                        <h3><i class="fas fa-money-bill-wave"></i> Pencatatan Pengeluaran</h3>
+                        
+                        <div class="expense-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="expense-description">Keterangan:</label>
+                                    <input type="text" id="expense-description" placeholder="Contoh: Beli bahan baku">
+                                </div>
+                                <div class="form-group">
+                                    <label for="expense-amount">Jumlah (฿):</label>
+                                    <input type="number" id="expense-amount" min="0" placeholder="Jumlah pengeluaran">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="expense-category">Kategori:</label>
+                                    <select id="expense-category">
+                                        <option value="bahan">Bahan Baku</option>
+                                        <option value="operasional">Operasional</option>
+                                        <option value="peralatan">Peralatan</option>
+                                        <option value="lainnya">Lainnya</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="expense-date">Tanggal:</label>
+                                    <input type="date" id="expense-date">
+                                </div>
+                            </div>
+                            <button class="btn primary" id="add-expense">
+                                <i class="fas fa-plus"></i> Tambah Pengeluaran
+                            </button>
+                        </div>
+                        
+                        <div class="expense-summary">
+                            <h4>Ringkasan Pengeluaran Bulan Ini</h4>
+                            <div class="expense-stats">
+                                <div class="expense-stat">
+                                    <span class="expense-label">Total Pengeluaran:</span>
+                                    <span class="expense-value" id="total-expense">0 ฿</span>
+                                </div>
+                                <div class="expense-stat">
+                                    <span class="expense-label">Pengeluaran Tertinggi:</span>
+                                    <span class="expense-value" id="highest-expense">0 ฿</span>
+                                </div>
+                                <div class="expense-stat">
+                                    <span class="expense-label">Rata-rata Harian:</span>
+                                    <span class="expense-value" id="daily-average-expense">0 ฿</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Queue Section -->
+            <section id="queue" class="content-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-tasks"></i> Antrian Order</h2>
+                    <p>Kelola order yang sedang diproses dan selesai</p>
+                </div>
+                
+                <div class="queue-container">
+                    <div class="queue-column">
+                        <div class="queue-header pending">
+                            <h3><i class="fas fa-clock"></i> Order Dalam Proses</h3>
+                            <span class="queue-count" id="pending-count">0</span>
+                        </div>
+                        <div class="queue-list" id="pending-queue">
+                            <!-- Order pending akan diisi oleh JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <div class="queue-column">
+                        <div class="queue-header preparing">
+                            <h3><i class="fas fa-utensils"></i> Sedang Disiapkan</h3>
+                            <span class="queue-count" id="preparing-count">0</span>
+                        </div>
+                        <div class="queue-list" id="preparing-queue">
+                            <!-- Order sedang disiapkan akan diisi oleh JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <div class="queue-column">
+                        <div class="queue-header completed">
+                            <h3><i class="fas fa-check-circle"></i> Order Selesai</h3>
+                            <span class="queue-count" id="completed-count">0</span>
+                        </div>
+                        <div class="queue-list" id="completed-queue">
+                            <!-- Order selesai akan diisi oleh JavaScript -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="queue-actions">
+                    <button class="btn secondary" id="refresh-queue">
+                        <i class="fas fa-sync-alt"></i> Perbarui Antrian
+                    </button>
+                    <button class="btn danger" id="clear-completed">
+                        <i class="fas fa-trash"></i> Hapus Order Selesai
+                    </button>
+                </div>
+            </section>
+            
+            <!-- Settings Section -->
+            <section id="settings" class="content-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-cog"></i> Pengaturan</h2>
+                    <p>Konfigurasi sistem kasir sesuai kebutuhan</p>
+                </div>
+                
+                <div class="settings-container">
+                    <div class="settings-tabs">
+                        <button class="settings-tab active" data-tab="general">Umum</button>
+                        <button class="settings-tab" data-tab="receipt">Struk</button>
+                        <button class="settings-tab" data-tab="notifications">Notifikasi</button>
+                        <button class="settings-tab" data-tab="backup">Backup</button>
+                    </div>
+                    
+                    <div class="settings-content">
+                        <!-- Tab Umum -->
+                        <div class="settings-tab-content active" id="general-tab">
+                            <form id="general-settings">
+                                <div class="form-group">
+                                    <label for="cashier-name">Nama Kasir:</label>
+                                    <input type="text" id="cashier-name" placeholder="Masukkan nama kasir">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="currency">Mata Uang:</label>
+                                    <select id="currency">
+                                        <option value="฿">Baht Thailand (฿)</option>
+                                        <option value="Rp">Rupiah Indonesia (Rp)</option>
+                                        <option value="$">Dollar AS ($)</option>
+                                        <option value="€">Euro (€)</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="language">Bahasa:</label>
+                                    <select id="language">
+                                        <option value="id">Bahasa Indonesia</option>
+                                        <option value="en">English</option>
+                                        <option value="th">ไทย</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="whatsapp-number">Nomor WhatsApp:</label>
+                                    <input type="text" id="whatsapp-number" placeholder="Contoh: +628123456789">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="telegram-number">Nomor Telegram:</label>
+                                    <input type="text" id="telegram-number" placeholder="Contoh: +628123456789">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="business-name">Nama Bisnis:</label>
+                                    <input type="text" id="business-name" placeholder="Nama restoran/toko Anda">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="business-address">Alamat Bisnis:</label>
+                                    <textarea id="business-address" rows="2" placeholder="Alamat lengkap bisnis"></textarea>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="business-phone">Telepon Bisnis:</label>
+                                    <input type="text" id="business-phone" placeholder="Nomor telepon bisnis">
+                                </div>
+                                
+                                <div class="form-actions">
+                                    <button type="submit" class="btn primary">
+                                        <i class="fas fa-save"></i> Simpan Pengaturan
+                                    </button>
+                                    <button type="button" class="btn secondary" id="reset-settings">
+                                        <i class="fas fa-undo"></i> Reset ke Default
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <!-- Tab Struk -->
+                        <div class="settings-tab-content" id="receipt-tab">
+                            <form id="receipt-settings">
+                                <div class="form-group">
+                                    <label for="receipt-header">Header Struk:</label>
+                                    <textarea id="receipt-header" rows="2" placeholder="Teks yang muncul di bagian atas struk"></textarea>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="receipt-footer">Footer Struk:</label>
+                                    <textarea id="receipt-footer" rows="2" placeholder="Teks yang muncul di bagian bawah struk"></textarea>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="receipt-logo">Logo URL (Opsional):</label>
+                                    <input type="text" id="receipt-logo" placeholder="URL logo untuk struk">
+                                </div>
+                                
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>
+                                            <input type="checkbox" id="show-tax" checked>
+                                            Tampilkan Pajak
+                                        </label>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>
+                                            <input type="checkbox" id="show-qr" checked>
+                                            Tampilkan Kode QR
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="tax-rate">Tarif Pajak (%):</label>
+                                        <input type="number" id="tax-rate" min="0" max="100" value="10" step="0.1">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="receipt-width">Lebar Struk (mm):</label>
+                                        <input type="number" id="receipt-width" min="50" max="150" value="80">
+                                    </div>
+                                </div>
+                                
+                                <div class="form-actions">
+                                    <button type="submit" class="btn primary">
+                                        <i class="fas fa-save"></i> Simpan Pengaturan Struk
+                                    </button>
+                                    <button type="button" class="btn secondary" id="print-test-receipt">
+                                        <i class="fas fa-print"></i> Cetak Struk Percobaan
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <!-- Tab Notifikasi -->
+                        <div class="settings-tab-content" id="notifications-tab">
+                            <div class="notification-settings">
+                                <h3>Pengaturan Notifikasi</h3>
+                                
+                                <div class="notification-options">
+                                    <div class="notification-option">
+                                        <label>
+                                            <input type="checkbox" id="notify-new-order" checked>
+                                            <span>Notifikasi order baru</span>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="notification-option">
+                                        <label>
+                                            <input type="checkbox" id="notify-low-stock" checked>
+                                            <span>Notifikasi stok rendah</span>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="notification-option">
+                                        <label>
+                                            <input type="checkbox" id="notify-daily-report">
+                                            <span>Laporan harian otomatis</span>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="notification-option">
+                                        <label>
+                                            <input type="checkbox" id="notify-monthly-report">
+                                            <span>Laporan bulanan otomatis</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="notification-test">
+                                    <h4>Test Notifikasi</h4>
+                                    <p>Kirim notifikasi percobaan untuk memastikan pengaturan berfungsi</p>
+                                    <button class="btn secondary" id="test-notification">
+                                        <i class="fas fa-bell"></i> Kirim Notifikasi Test
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Tab Backup -->
+                        <div class="settings-tab-content" id="backup-tab">
+                            <div class="backup-settings">
+                                <h3>Backup & Restore Data</h3>
+                                
+                                <div class="backup-options">
+                                    <div class="backup-option">
+                                        <h4><i class="fas fa-download"></i> Backup Data</h4>
+                                        <p>Simpan semua data kasir ke file JSON</p>
+                                        <button class="btn primary" id="backup-data">
+                                            <i class="fas fa-file-export"></i> Backup Sekarang
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="backup-option">
+                                        <h4><i class="fas fa-upload"></i> Restore Data</h4>
+                                        <p>Muat data dari file backup sebelumnya</p>
+                                        <div class="restore-controls">
+                                            <input type="file" id="restore-file" accept=".json">
+                                            <button class="btn secondary" id="restore-data">
+                                                <i class="fas fa-file-import"></i> Restore Data
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="backup-option">
+                                        <h4><i class="fas fa-trash"></i> Hapus Data</h4>
+                                        <p>Hapus semua data dari sistem (tidak dapat dikembalikan)</p>
+                                        <button class="btn danger" id="clear-all-data">
+                                            <i class="fas fa-exclamation-triangle"></i> Hapus Semua Data
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="auto-backup">
+                                    <h4><i class="fas fa-robot"></i> Backup Otomatis</h4>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label>
+                                                <input type="checkbox" id="auto-backup" checked>
+                                                Aktifkan backup otomatis
+                                            </label>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="backup-frequency">Frekuensi:</label>
+                                            <select id="backup-frequency">
+                                                <option value="daily">Harian</option>
+                                                <option value="weekly">Mingguan</option>
+                                                <option value="monthly">Bulanan</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Dashboard Kasir v1.0 &copy; 2023 - Sistem Kasir Otomatis</p>
+            <div class="footer-links">
+                <span id="data-status">
+                    <i class="fas fa-database"></i> Data tersimpan lokal
+                </span>
+                <button id="help-btn">
+                    <i class="fas fa-question-circle"></i> Bantuan
+                </button>
+            </div>
+        </footer>
+    </div>
+    
+    <!-- Modal untuk Preview Pesanan -->
+    <div id="order-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Detail Pesanan</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body" id="order-modal-body">
+                <!-- Detail pesanan akan diisi oleh JavaScript -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn secondary modal-close-btn">Tutup</button>
+                <button class="btn primary" id="reprint-receipt">
+                    <i class="fas fa-print"></i> Cetak Ulang Struk
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal untuk Cetak Struk -->
+    <div id="receipt-modal" class="modal">
+        <div class="modal-content receipt-modal">
+            <div class="modal-header">
+                <h3>Struk Pembayaran</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="receipt-content">
+                    <!-- Struk akan diisi oleh JavaScript -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn secondary modal-close-btn">Tutup</button>
+                <button class="btn primary" id="print-receipt-btn">
+                    <i class="fas fa-print"></i> Cetak Struk
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal untuk Tambah Stok -->
+    <div id="stock-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Tambah Stok Barang</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="stock-form">
+                    <div class="form-group">
+                        <label for="stock-item">Nama Barang:</label>
+                        <input type="text" id="stock-item" required placeholder="Nama barang">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="stock-quantity">Jumlah:</label>
+                            <input type="number" id="stock-quantity" required min="1" value="1">
+                        </div>
+                        <div class="form-group">
+                            <label for="stock-minimum">Stok Minimum:</label>
+                            <input type="number" id="stock-minimum" required min="1" value="5">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="stock-unit">Satuan:</label>
+                        <select id="stock-unit">
+                            <option value="pcs">Pcs</option>
+                            <option value="kg">Kg</option>
+                            <option value="gram">Gram</option>
+                            <option value="liter">Liter</option>
+                            <option value="pack">Pack</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="stock-notes">Catatan:</label>
+                        <textarea id="stock-notes" rows="2" placeholder="Catatan tambahan"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn secondary modal-close-btn">Batal</button>
+                <button type="submit" form="stock-form" class="btn primary">Simpan Stok</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Notifikasi -->
+    <div id="notification-container"></div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
